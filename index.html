@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>賴冠宏旅遊站 | 探索極致奢華的旅行足跡</title>
+
+  <!-- SEO 優化中繼標記 -->
+  <meta name="description" content="跟隨頂級旅行家賴冠宏，探索全球最奢華的隱秘度假村、極致自然景觀與精緻旅途記事。專屬暗黑雲端相簿，永久保存您的完美旅途光影。">
+  <meta name="keywords" content="賴冠宏, 賴冠宏旅遊站, 奢華旅遊, 個人旅遊網站, 圖片上傳, Supabase Storage, 旅遊記事">
+  <meta name="author" content="賴冠宏 Kuan-hung Lai">
+
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome 6 圖標庫 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- 專案客製化奢華美學 CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       1. 奢華導覽列 (Navbar)
+       ========================================================================== -->
+  <nav class="navbar navbar-expand-lg luxury-navbar fixed-top">
+    <div class="container">
+      <a class="navbar-brand-lux" href="#" id="main-logo">
+        <i class="fa-solid fa-compass"></i>
+        <span>賴冠宏旅遊站</span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+        style="color: var(--color-gold-base);">
+        <i class="fa-solid fa-bars-staggered fs-3"></i>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav align-items-center">
+          <li class="nav-item">
+            <a class="nav-link nav-link-lux active" href="#" id="nav-home">首頁</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-lux" href="#about-section" id="nav-about">關於冠宏</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-lux" href="#showcase-section" id="nav-showcase">精選足跡</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-lux" href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"
+              id="nav-upload"><i class="fa-solid fa-cloud-arrow-up me-1"></i>旅遊記事</a>
+          </li>
+          <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+            <button class="btn btn-lux open-config" id="btn-config-trigger"
+              style="padding: 10px 24px; font-size: 0.9rem;">
+              <i class="fa-solid fa-sliders me-1"></i>雲端設定
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==========================================================================
+       2. 隱藏式金鑰動態設定抽屜 (Config Drawer)
+       ========================================================================== -->
+  <div class="config-overlay"></div>
+  <div class="config-drawer" id="configDrawer">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="luxury-title mb-0" style="color: var(--color-gold-dark);">
+        <i class="fa-solid fa-cloud me-2"></i>雲端同步設定
+      </h4>
+      <button class="close-config border-0 bg-transparent text-muted fs-4">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="flex-grow-1">
+      <p class="text-muted small mb-4">
+        本網站支援將圖片自動上傳至您的私有 <strong>Supabase Storage</strong> 空間。若未設定，將自動啟用「奢華本機模擬上傳」讓您無縫體驗。
+      </p>
+
+      <div class="mb-3">
+        <label for="supabase-url" class="form-label small fw-bold" style="color: var(--color-sky-navy);">Supabase
+          Project URL</label>
+        <input type="text" class="form-control border-secondary-subtle" id="supabase-url"
+          placeholder="https://your-project.supabase.co" style="border-radius: 8px;">
+      </div>
+
+      <div class="mb-3">
+        <label for="supabase-key" class="form-label small fw-bold" style="color: var(--color-sky-navy);">Supabase Anon
+          Key</label>
+        <input type="password" class="form-control border-secondary-subtle" id="supabase-key"
+          placeholder="eyJhbGciOiJIUzI1NiIsIn..." style="border-radius: 8px;">
+      </div>
+
+      <div class="mb-4">
+        <label for="supabase-bucket" class="form-label small fw-bold" style="color: var(--color-sky-navy);">Storage
+          Bucket 名稱</label>
+        <input type="text" class="form-control border-secondary-subtle" id="supabase-bucket" placeholder="travel-images"
+          style="border-radius: 8px;">
+        <div class="form-text small text-muted">請確認該 Bucket 權限已設為 Public（公開讀取）。</div>
+      </div>
+    </div>
+
+    <button class="btn btn-lux w-100 py-3" id="btn-save-config">
+      <i class="fa-solid fa-floppy-disk me-2"></i>儲存設定並連結
+    </button>
+  </div>
+
+  <!-- ==========================================================================
+       3. 大器英雄區 (Hero Section & CTA)
+       ========================================================================== -->
+  <section class="hero-section" id="hero-section">
+    <div class="hero-bg-shapes">
+      <div class="hero-shape hero-shape-1"></div>
+      <div class="hero-shape hero-shape-2"></div>
+    </div>
+
+    <div class="container hero-content">
+      <div class="row align-items-center">
+        <div class="col-lg-6 text-center text-lg-start">
+          <span class="hero-tagline">LAI KUAN HUNG TRAVEL STATION</span>
+          <h1 class="hero-title">
+            跟隨賴冠宏<br>
+            探索<span>極致奢華</span>的旅行足跡
+          </h1>
+          <p class="hero-desc">
+            世界不只是一張地圖，更是一首待譜寫的奢華交響樂。在此，我們用尊貴的視角記錄下每一趟與靈魂共鳴的旅途。
+          </p>
+          <div class="mt-4">
+            <button class="btn btn-lux" data-bs-toggle="modal" data-bs-target="#uploadModal" id="cta-primary">
+              <i class="fa-solid fa-camera-retro me-2"></i>開啟旅遊記事
+            </button>
+            <a href="#about-section" class="btn btn-lux-secondary" id="cta-secondary">
+              探索旅程足跡
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-6 mt-5 mt-lg-0">
+          <div class="hero-image-wrapper mx-auto" style="max-width: 500px;">
+            <div class="hero-deco-frame"></div>
+            <div class="hero-image-container">
+              <!-- 使用優雅的高畫質旅遊圖片 (Unsplash) -->
+              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop"
+                alt="極致奢華海灘" id="hero-img">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       4. 核心標題與尊貴卡片區 (About & Core Cards)
+       ========================================================================== -->
+  <section class="py-5" id="about-section" style="background-color: var(--color-cream-light);">
+    <div class="container py-5">
+
+      <!-- 核心標題 -->
+      <div class="section-header">
+        <span class="section-subtitle">THE ART OF TRAVEL</span>
+        <h2 class="section-title">跨越地平線的尊貴旅程</h2>
+      </div>
+
+      <div class="row justify-content-center">
+        <!-- 個人介紹卡片 -->
+        <div class="col-md-6 col-lg-5 luxury-card-wrapper">
+          <div class="luxury-card" id="card-intro">
+            <div class="card-inner-content">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="lux-avatar-wrapper">
+                  <!-- 使用高畫質奢華旅行家頭像 -->
+                  <img
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop"
+                    class="lux-avatar" alt="賴冠宏">
+                </div>
+                <span class="badge badge-lux">FOUNDER</span>
+              </div>
+              <span class="card-tag">ABOUT ME</span>
+              <h3 class="card-title-lux">個人介紹</h3>
+              <p class="card-intro-text">
+                我是<strong>賴冠宏 (Kuan-hung
+                  Lai)</strong>，一位對世界充滿熱情的頂級旅行家與視覺探險者。足跡遍及全球數十個國家，專注於深度發掘隱世度假天堂、感受多元在地人文，並以最高品質的影像與文字記錄生命中最尊貴的旅行瞬間。
+              </p>
+            </div>
+
+            <div class="card-footer-lux">
+              <a href="#showcase-section" class="card-link-lux">
+                查看探險足跡 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+              <span class="small text-muted"><i class="fa-solid fa-plane-departure me-1"></i>30+ 國家</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 旅遊記事卡片 -->
+        <div class="col-md-6 col-lg-5 luxury-card-wrapper">
+          <div class="luxury-card" id="card-journal">
+            <div class="card-inner-content">
+              <div class="d-flex justify-content-between align-items-start mb-4">
+                <div class="lux-avatar-wrapper"
+                  style="background: var(--sky-gradient); display:flex; align-items:center; justify-content:center;">
+                  <i class="fa-solid fa-box-open fs-2 text-primary"
+                    style="color: var(--color-sky-dark) !important;"></i>
+                </div>
+                <span class="badge badge-lux"
+                  style="background: var(--sky-gradient); color: var(--color-sky-dark); border: 1px solid var(--color-sky-base)">JOURNAL</span>
+              </div>
+              <span class="card-tag">DIGITAL ARCHIVE</span>
+              <h3 class="card-title-lux">旅遊記事</h3>
+              <p class="card-intro-text">
+                每一段旅途都應被完美珍藏。點擊此卡片開啟專屬的「暗黑極光圖片上傳系統」。系統支援無痛拖曳、即時高畫質預覽以及安全可靠的 Supabase 雲端儲存，讓您的回憶跨越時間，永久閃耀。
+              </p>
+            </div>
+
+            <div class="card-footer-lux">
+              <a href="#" class="card-link-lux" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                立即上傳記事 <i class="fa-solid fa-circle-plus"></i>
+              </a>
+              <span class="small text-muted"><i class="fa-solid fa-cloud-arrow-up me-1"></i>雲端同步</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       5. 精選足跡區 (Showcase Cards from API Endpoints)
+       ========================================================================== -->
+  <section class="py-5" id="showcase-section" style="background-color: var(--color-cream-base);">
+    <!-- ==========================================================================
+       5. 奢華旅遊相簿牆 (Dynamic Travel Albums Card Grid)
+       ========================================================================== -->
+    <section class="py-5" id="showcase-section" style="background-color: var(--color-cream-base);">
+      <div class="container py-5">
+
+        <div class="section-header d-flex flex-column align-items-center">
+          <span class="section-subtitle">DISCOVER ALBUMS</span>
+          <h2 class="section-title">賴冠宏的奢華旅遊相簿牆</h2>
+          <button class="btn btn-lux mt-3 px-4 py-2" id="btn-create-album-home" data-bs-toggle="modal"
+            data-bs-target="#createAlbumModal">
+            <i class="fa-solid fa-folder-plus me-2"></i> 新增旅遊相簿
+          </button>
+        </div>
+
+        <div class="row g-4" id="album-grid">
+          <!-- JS 動態插入相簿資料夾卡片 -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       6. 多人共創奢華旅遊相簿系統 (Multiplayer Travel Album System Modal)
+       ========================================================================== -->
+    <div class="modal fade modal-dark-lux" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content modal-dark-content" style="border: none; border-radius: 0;">
+
+          <!-- 模組標頭 -->
+          <div class="modal-dark-header d-flex justify-content-between align-items-center"
+            style="border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding: 20px 30px;">
+            <h5 class="modal-title modal-dark-title" id="uploadModalLabel" style="font-size: 1.6rem;">
+              <i class="fa-solid fa-folder-open text-warning"></i> 多人共創旅遊相簿系統
+            </h5>
+
+            <div class="d-flex align-items-center gap-3">
+              <!-- 實時同步指示燈 -->
+              <div class="d-flex align-items-center gap-2 px-3 py-1 bg-black bg-opacity-40"
+                style="border-radius: 50px; border: 1px solid rgba(212, 175, 55, 0.15);">
+                <span class="sync-pulse-dot"></span>
+                <span class="small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.05em;">雲端實時同步中</span>
+              </div>
+
+              <button class="btn btn-outline-lux-dark btn-sm text-white-50 px-2 py-1" id="btn-refresh-gallery"
+                title="手動同步更新"
+                style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px;">
+                <i class="fa-solid fa-rotate-right me-1 text-warning"></i>同步
+              </button>
+
+              <button type="button" class="modal-dark-close ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 模組內容 -->
+          <div class="modal-dark-body"
+            style="background: linear-gradient(to bottom, #111115 0%, #09090b 100%); overflow-y: auto; height: calc(100vh - 80px);">
+            <div class="container py-4">
+
+              <!-- 相簿階層麵包屑與新增相簿列 -->
+              <div class="row justify-content-center mb-4">
+                <div class="col-lg-10">
+                  <div class="d-flex align-items-center justify-content-between p-3"
+                    style="background: rgba(24, 24, 28, 0.7); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 14px; backdrop-filter: blur(10px);">
+                    <div class="d-flex align-items-center gap-2">
+                      <button class="btn btn-outline-lux-dark btn-sm" id="btn-back-to-albums"
+                        style="display: none; padding: 5px 12px; font-size: 0.8rem;">
+                        <i class="fa-solid fa-chevron-left me-1"></i> 回相簿列表
+                      </button>
+                      <span class="text-white-50 small" id="album-breadcrumb">目前位置：<strong
+                          class="text-warning">相簿列表</strong></span>
+                    </div>
+                    <button class="btn btn-lux btn-sm py-1 px-3" data-bs-toggle="modal"
+                      data-bs-target="#createAlbumModal" style="font-size: 0.8rem;" id="btn-create-album-modal">
+                      <i class="fa-solid fa-folder-plus me-1"></i> 新增相簿
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 上傳設定與拖曳區 (僅在進入特定相簿時顯示) -->
+              <div class="row justify-content-center mb-5" id="album-upload-section" style="display: none;">
+                <div class="col-lg-8 col-xl-7">
+                  <div class="p-4"
+                    style="background: rgba(24, 24, 28, 0.7); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 20px; backdrop-filter: blur(15px);">
+
+                    <!-- 暱稱輸入欄 -->
+                    <div class="row mb-3 g-2 align-items-center justify-content-center">
+                      <div class="col-sm-9">
+                        <div class="input-group">
+                          <span class="input-group-text bg-black border-0 text-white-50 small"
+                            style="border-radius: 10px 0 0 10px; border-right: 1px solid rgba(255,255,255,0.05); font-weight: 500;">
+                            <i class="fa-solid fa-user me-1 text-warning"></i> 旅人暱稱
+                          </span>
+                          <input type="text" class="form-control bg-black border-0 text-white small" id="uploader-name"
+                            placeholder="匿名旅行家"
+                            style="border-radius: 0 10px 10px 0; color: white !important; font-weight: 500; font-size: 0.9rem;"
+                            maxlength="15">
+                        </div>
+                        <div class="form-text small text-white-50 mt-1 text-center text-sm-start"><i
+                            class="fa-solid fa-circle-info me-1"></i>上傳多張相片後，系統會自動將其歸入目前開啟的相簿資料夾下。</div>
+                      </div>
+                    </div>
+
+                    <!-- 拖曳上傳區 -->
+                    <div class="dark-dropzone py-5" id="dark-dropzone">
+                      <input type="file" id="file-input" class="d-none" multiple accept="image/*">
+                      <div class="dropzone-icon-wrapper">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                      </div>
+                      <p class="dropzone-title">拖曳多張旅圖放入此相簿</p>
+                      <p class="dropzone-subtitle mb-0">或點擊此區域瀏覽本地檔案 (支援 JPG, PNG, GIF, WEBP)</p>
+                    </div>
+
+                    <!-- 上傳進度條 -->
+                    <div class="progress-lux-container" id="progress-container">
+                      <div class="progress-lux-bar" id="progress-bar"></div>
+                      <div class="progress-lux-text" id="progress-text">準備上傳 0%</div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <!-- 多人相片牆展示區 -->
+              <div class="dark-gallery-container mt-2">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary-subtle"
+                  style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                  <h6 class="gallery-section-title mb-0" style="font-size: 1.25rem;" id="gallery-title-text">
+                    <i class="fa-solid fa-images text-warning me-2"></i> 眾人共享的旅途相簿
+                  </h6>
+                  <span class="badge-lux" id="total-photos-badge"
+                    style="background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); font-size: 0.8rem; padding: 4px 12px;">
+                    載入中...
+                  </span>
+                </div>
+
+                <!-- 多人卡片瀑布流/格線系統 (動態顯示相簿或相簿內相片) -->
+                <div class="row g-4" id="gallery-grid">
+                  <!-- JS 動態插入相簿卡片或相片卡片 -->
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+       7. 圖片大圖檢視燈箱 (Lightbox Modal)
+       ========================================================================== -->
+    <div class="lightbox-modal" id="lightbox-modal">
+      <div class="lightbox-content-container">
+        <button class="lightbox-close"><i class="fa-solid fa-xmark"></i></button>
+        <img src="" alt="大圖檢視" class="lightbox-img" id="lightbox-img">
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+       8. 尊貴頁尾 (Footer)
+       ========================================================================== -->
+    <footer class="luxury-footer">
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-4 text-center text-lg-start">
+            <a class="footer-brand" href="#">賴冠宏旅遊站</a>
+            <p class="footer-desc">
+              探索世界的腳步永不停歇。用極致的品味刻畫每一次奢華探險，將絕美回憶永久存儲於科技雲端。
+            </p>
+            <div class="footer-socials justify-content-center justify-content-lg-start">
+              <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+              <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+              <a href="#" class="social-icon"><i class="fa-brands fa-x-twitter"></i></a>
+            </div>
+          </div>
+
+          <div class="col-6 col-lg-4 text-center">
+            <h5 class="footer-title-lux">精選航線</h5>
+            <ul class="footer-links">
+              <li><a href="#showcase-section">歐洲阿爾卑斯木屋</a></li>
+              <li><a href="#showcase-section">馬爾地夫隱世別墅</a></li>
+              <li><a href="#showcase-section">日本京都禪意之秋</a></li>
+              <li><a href="#showcase-section">極光破冰船探索</a></li>
+            </ul>
+          </div>
+
+          <div class="col-6 col-lg-4 text-center text-lg-start">
+            <h5 class="footer-title-lux">快速連結</h5>
+            <ul class="footer-links">
+              <li><a href="#hero-section">首頁頂部</a></li>
+              <li><a href="#about-section">關於賴冠宏</a></li>
+              <li><a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal">上傳旅遊記事</a></li>
+              <li><a href="#" class="open-config">設定同步金鑰</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom text-center">
+          <p class="mb-0">&copy; 2026 賴冠宏旅遊站. All Rights Reserved. Crafted with <i class="fa-solid fa-heart"
+              style="color: var(--color-gold-base);"></i> by Premium Luxury Design System.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ==========================================================================
+       9. 尊爵 Toast 提示訊息容器 (Toast Container)
+       ========================================================================== -->
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1300;">
+      <!-- JS 動態插入 Toast -->
+    </div>
+
+    <!-- jQuery 3.7.1 CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap 5 Bundle JS (含 Popper) CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 專案客製化邏輯 JS -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>
